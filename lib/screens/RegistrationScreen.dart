@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:riderapp/main.dart';
 import 'package:riderapp/screens/LoginScreen.dart';
+import 'package:riderapp/screens/MainScreen.dart';
 import 'package:riderapp/utils/MainAppToast.dart';
 
 class RegistrationScreen extends StatelessWidget {
@@ -111,16 +113,20 @@ class RegistrationScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(24.0))),
                       ),
                       onPressed: () {
-                        registerNewUser(context);
                         if (nameEditingController.text.length < 4) {
                           displayToastMessage(
                               context, "Name must be atleast 4 characters.");
                         } else if (!emailEditingController.text.contains("@")) {
                           displayToastMessage(
-                              context, "Email address is not valid");
+                              context, "Email address is not valid.");
                         } else if (phoneEditingController.text.isEmpty) {
                           displayToastMessage(
                               context, "Phone number is required.");
+                        } else if (passwordEditingController.text.length < 7) {
+                          displayToastMessage(context,
+                              "Password must be at least 6 characters.");
+                        } else {
+                          registerNewUser(context);
                         }
                       },
                       child: Container(
@@ -162,6 +168,23 @@ class RegistrationScreen extends StatelessWidget {
               email: emailEditingController.text,
               password: passwordEditingController.text))
           .user!;
-    } catch (e) {}
+      //saving user data to Firebase Database
+
+      Map userDataMap = {
+        "name": nameEditingController.text.trim(),
+        "email": emailEditingController.text.trim(),
+        "phone": phoneEditingController.text.trim(),
+      };
+
+      userRef.child(user.uid).set(userDataMap);
+
+      displayToastMessage(context,
+          "Congratulations! your account has been created successfully");
+
+      Navigator.pushNamedAndRemoveUntil(
+          context, MainScreen.idScreen, (route) => false);
+    } catch (e) {
+      displayToastMessage(context, "Error: " + e.toString());
+    }
   }
 }
