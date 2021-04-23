@@ -1,16 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:riderapp/screens/LoginScreen.dart';
+import 'package:riderapp/utils/MainAppToast.dart';
 
 class RegistrationScreen extends StatelessWidget {
- static const idScreen = 'register';
- TextEditingController nameEditingController = TextEditingController();
- TextEditingController emailEditingController = TextEditingController();
- TextEditingController phoneEditingController = TextEditingController();
- TextEditingController passwordEditingController = TextEditingController();
+  static const idScreen = 'register';
+  TextEditingController nameEditingController = TextEditingController();
+  TextEditingController emailEditingController = TextEditingController();
+  TextEditingController phoneEditingController = TextEditingController();
+  TextEditingController passwordEditingController = TextEditingController();
 
- final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,8 @@ class RegistrationScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         labelText: 'Name',
                         labelStyle: TextStyle(fontSize: 14.0),
-                        hintStyle: TextStyle(fontSize: 10.0, color: Colors.grey),
+                        hintStyle:
+                            TextStyle(fontSize: 10.0, color: Colors.grey),
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
@@ -64,7 +65,8 @@ class RegistrationScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         labelText: 'Email',
                         labelStyle: TextStyle(fontSize: 14.0),
-                        hintStyle: TextStyle(fontSize: 10.0, color: Colors.grey),
+                        hintStyle:
+                            TextStyle(fontSize: 10.0, color: Colors.grey),
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
@@ -77,7 +79,8 @@ class RegistrationScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         labelText: 'Phone',
                         labelStyle: TextStyle(fontSize: 14.0),
-                        hintStyle: TextStyle(fontSize: 10.0, color: Colors.grey),
+                        hintStyle:
+                            TextStyle(fontSize: 10.0, color: Colors.grey),
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
@@ -90,7 +93,8 @@ class RegistrationScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         labelText: 'Password',
                         labelStyle: TextStyle(fontSize: 14.0),
-                        hintStyle: TextStyle(fontSize: 10.0, color: Colors.grey),
+                        hintStyle:
+                            TextStyle(fontSize: 10.0, color: Colors.grey),
                       ),
                       style: TextStyle(fontSize: 14.0),
                     ),
@@ -108,27 +112,41 @@ class RegistrationScreen extends StatelessWidget {
                       ),
                       onPressed: () {
                         registerNewUser(context);
+                        if (nameEditingController.text.length < 4) {
+                          displayToastMessage(
+                              context, "Name must be atleast 4 characters.");
+                        } else if (!emailEditingController.text.contains("@")) {
+                          displayToastMessage(
+                              context, "Email address is not valid");
+                        } else if (phoneEditingController.text.isEmpty) {
+                          displayToastMessage(
+                              context, "Phone number is required.");
+                        }
                       },
                       child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 35,
-                          child: Center(
-                              child: Text(
+                        width: MediaQuery.of(context).size.width,
+                        height: 35,
+                        child: Center(
+                          child: Text(
                             "Create Account",
-                            style:
-                                TextStyle(fontSize: 18.0, fontFamily: 'Brand-Bold'),
-                          ))),
+                            style: TextStyle(
+                                fontSize: 18.0, fontFamily: 'Brand-Bold'),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.idScreen, (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, LoginScreen.idScreen, (route) => false);
                 },
                 child: Text(
                   "Already have an Account? Login Here.",
-                  style: TextStyle(fontFamily: 'Brand-Bold', color: Colors.black),
+                  style:
+                      TextStyle(fontFamily: 'Brand-Bold', color: Colors.black),
                 ),
               ),
             ],
@@ -138,14 +156,12 @@ class RegistrationScreen extends StatelessWidget {
     );
   }
 
-  
-  void registerNewUser(BuildContext context) async{
-     try {
-       final User user = (await firebaseAuth
-     .createUserWithEmailAndPassword(email: emailEditingController.text, 
-     password: passwordEditingController.text)).user!;
-     } catch (e) {
-     }
-
+  void registerNewUser(BuildContext context) async {
+    try {
+      final User user = (await firebaseAuth.createUserWithEmailAndPassword(
+              email: emailEditingController.text,
+              password: passwordEditingController.text))
+          .user!;
+    } catch (e) {}
   }
 }
