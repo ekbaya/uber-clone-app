@@ -4,6 +4,7 @@ import 'package:riderapp/main.dart';
 import 'package:riderapp/screens/LoginScreen.dart';
 import 'package:riderapp/screens/MainScreen.dart';
 import 'package:riderapp/utils/MainAppToast.dart';
+import 'package:riderapp/widgets/ProgressDialog.dart';
 
 class RegistrationScreen extends StatelessWidget {
   static const idScreen = 'register';
@@ -122,7 +123,7 @@ class RegistrationScreen extends StatelessWidget {
                         } else if (phoneEditingController.text.isEmpty) {
                           displayToastMessage(
                               context, "Phone number is required.");
-                        } else if (passwordEditingController.text.length < 7) {
+                        } else if (passwordEditingController.text.length < 6) {
                           displayToastMessage(context,
                               "Password must be at least 6 characters.");
                         } else {
@@ -163,6 +164,13 @@ class RegistrationScreen extends StatelessWidget {
   }
 
   void registerNewUser(BuildContext context) async {
+    showDialog(context: context, 
+    barrierDismissible:  false,
+    builder: (BuildContext context){
+      return ProgressDialog(message: "Registering, please wait...");
+    });
+
+
     try {
       final User user = (await firebaseAuth.createUserWithEmailAndPassword(
               email: emailEditingController.text,
@@ -184,6 +192,7 @@ class RegistrationScreen extends StatelessWidget {
       Navigator.pushNamedAndRemoveUntil(
           context, MainScreen.idScreen, (route) => false);
     } catch (e) {
+      Navigator.pop(context);
       displayToastMessage(context, "Error: " + e.toString());
     }
   }
