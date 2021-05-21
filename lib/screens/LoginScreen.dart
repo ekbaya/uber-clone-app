@@ -8,6 +8,7 @@ import 'package:riderapp/widgets/ProgressDialog.dart';
 
 import 'MainScreen.dart';
 
+// ignore: must_be_immutable
 class LoginScreen extends StatelessWidget {
   static const idScreen = 'login';
   TextEditingController emailEditingController = TextEditingController();
