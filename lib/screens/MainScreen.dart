@@ -59,8 +59,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       encodedPoints: "");
 
   void saveRideRequest() {
-    var pickUp = Provider.of<AppData>(context).userPickUpLocation;
-    var dropOff = Provider.of<AppData>(context).userDropOffLocation;
+    var pickUp =
+        Provider.of<AppData>(context, listen: false).userPickUpLocation;
+    var dropOff =
+        Provider.of<AppData>(context, listen: false).userDropOffLocation;
 
     Map pickLocationMap = {
       "latitude": pickUp.latitude.toString(),
@@ -414,7 +416,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                   ? Provider.of<AppData>(context)
                                       .userPickUpLocation
                                       .placeName
-                                  : "Add Home"),
+                                  : "Add Home", overflow: TextOverflow.ellipsis,),
                               SizedBox(
                                 height: 4.0,
                               ),
@@ -701,13 +703,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void getPlaceDirection() async {
-    var initialPosition = Provider.of<AppData>(context).userPickUpLocation;
-    var finalPosition = Provider.of<AppData>(context).userDropOffLocation;
+    var initialPosition =
+        Provider.of<AppData>(context, listen: false).userPickUpLocation;
+    var finalPosition =
+        Provider.of<AppData>(context, listen: false).userDropOffLocation;
 
     var pickUpLatLng =
         LatLng(initialPosition.latitude, initialPosition.longitude);
     var dropOffLatLng =
-        LatLng(initialPosition.latitude, initialPosition.longitude);
+        LatLng(finalPosition.latitude, finalPosition.longitude);
 
     showDialog(
         context: context,

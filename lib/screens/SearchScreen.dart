@@ -185,7 +185,7 @@ class _SearchScreenState extends State<SearchScreen> {
         return;
       }
 
-      if (res["status" == "OK"]) {
+      if (res["status"] == "OK") {
         var predictions = res["predictions"];
 
         var placesList = (predictions as List)
@@ -262,18 +262,20 @@ class PredictionTile extends StatelessWidget {
     String placeDetailsUrl =
         "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
     var resp = await GoogleMapsRepository.getRequest(placeDetailsUrl);
+    print("****************RESP***************");
+    print(resp);
     Navigator.of(context).pop();
     if (resp == "failed") {
       return;
     }
 
-    if (resp["status" == "OK"]) {
+    if (resp["status"] == "OK") {
       Address address = Address(
         formattedAddress: "",
         placeName: resp["result"]["name"],
         placeId: placeId,
-        latitude: resp["result"]["geometry"]["loction"]["lat"],
-        longitude: resp["result"]["geometry"]["loction"]["lng"],
+        latitude: resp["result"]["geometry"]["location"]["lat"],
+        longitude: resp["result"]["geometry"]["location"]["lng"],
       );
 
       Provider.of<AppData>(context, listen: false).updateDropOffLocationAddress(address);

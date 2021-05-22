@@ -16,8 +16,10 @@ class MainAppAPI {
   static Future<String> searchCoordinatesAddress(
       Position position, context) async {
     String placeAddress = "";
+    String lat = position.latitude.toString();
+    String lng = position.longitude.toString();
     String url =
-        "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$mapKey";
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$mapKey";
 
     var response = await GoogleMapsRepository.getRequest(url);
 
