@@ -6,9 +6,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:riderapp/appConfig.dart';
 import 'package:riderapp/dataHandler/appData.dart';
-import 'package:riderapp/helpers/GoogleMapsAPIMethods.dart';
+import 'package:riderapp/helpers/MainAppAPI.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:riderapp/main.dart';
 import 'package:riderapp/models/DirectionDetail.dart';
+import 'package:riderapp/screens/LoginScreen.dart';
 import 'package:riderapp/screens/SearchScreen.dart';
 import 'package:riderapp/widgets/Divider.dart';
 import 'package:riderapp/widgets/ProgressDialog.dart';
@@ -35,6 +39,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   Set<Circle> circlesSet = {};
   bool drwawerOpen = true;
 
+  @override
+  void initState() { 
+    super.initState();
+    MainAppAPI.getCurrentOnlineUserInfo();
+  }
+
   List<LatLng> pLinesCoordinates = [];
   Set<Polyline> polyLineSet = {};
 
@@ -48,10 +58,45 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       durationText: "",
       encodedPoints: "");
 
+  void saveRideRequest(){
+    var pickUp = Provider.of<AppData>(context).userPickUpLocation;
+    var dropOff = Provider.of<AppData>(context).userDropOffLocation;
+
+    Map pickLocationMap = {
+      "latitude": pickUp.latitude.toString(),
+      "longitude": pickUp.longitude.toString(),
+    };
+
+    Map dropOffLocationMap = {
+      "latitude": dropOff.latitude.toString(),
+      "longitude": dropOff.longitude.toString(),
+    };
+
+    Map rideInfoMap = {
+      "driver_id": "waiting",
+      "payment_method":"cash",
+      "pickup": pickLocationMap,
+      "dropoff": dropOffLocationMap,
+      "craeted_at": DateTime.now().toString(),
+      "rider_name": currentUser.name,
+      "rider_phone": currentUser.phone,
+      "pickup_address": pickUp.placeName,
+      "dropoff_address": dropOff.placeName,
+    };
+
+    rideRequestRef.set(rideInfoMap);
+  }
+
+  void cancelRideRequest(){
+    rideRequestRef.remove();
+    resetApp();
+  }
+
   resetApp() {
     setState(() {
       searchContainerHeight = 300.0;
       rideDetailsContainerHeight = 0.0;
+      requestRideContainerHeight = 0.0;
       bottomPaddingOfMap = 230;
       drwawerOpen = true;
 
@@ -73,6 +118,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       bottomPaddingOfMap = 230.0;
       drwawerOpen = false;
     });
+
+    saveRideRequest();
   }
 
   void locatePosition() async {
@@ -87,7 +134,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
     String address =
-        await GoogleMapsAPIMethods.searchCoordinatesAddress(position, context);
+        await MainAppAPI.searchCoordinatesAddress(position, context);
     print("THIS IS YOUR ADDRESS:: " + address);
   }
 
@@ -118,9 +165,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(
-        title: Text("Main Screen"),
-      ),
       drawer: Container(
         color: Colors.white,
         width: 255.0,
@@ -194,6 +238,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+              GestureDetector(
+                child: ListTile(
+                  leading: Icon(Icons.info),
+                  title: Text(
+                    "Log out",
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
+                  ),
+                ),
+                onTap: (){
+                  firebaseAuth.signOut();
+                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.idScreen, (route) => false);
+                },
+              ),
             ],
           ),
         ),
@@ -201,7 +260,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       body: Stack(
         children: [
           GoogleMap(
-            padding: EdgeInsets.only(bottom: bottomPaddingOfMap),
+            padding: EdgeInsets.only(bottom: bottomPaddingOfMap, top: 30),
             mapType: MapType.normal,
             myLocationButtonEnabled: true,
             initialCameraPosition: _kGooglePlex,
@@ -223,7 +282,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
           //Handle button for drawer
           Positioned(
-            top: 38.0,
+            top: 45.0,
             left: 22.0,
             child: GestureDetector(
               child: Container(
@@ -478,7 +537,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                               ),
                               Text(
                                 ((tripDirectionDetail.distanceText != ""
-                                    ? 'KES ${GoogleMapsAPIMethods.calculateFare(tripDirectionDetail)}'
+                                    ? 'KES ${MainAppAPI.calculateFare(tripDirectionDetail)}'
                                     : '')),
                                 style: TextStyle(
                                     fontSize: 16.0, fontFamily: "Brand-Bold"),
@@ -609,17 +668,23 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     SizedBox(
                       height: 22.0,
                     ),
-                    Container(
-                      height: 60.0,
-                      width: 60.0,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(26.0),
-                        border: Border.all(
-                          color: Colors.grey,
+                    GestureDetector(
+                      onTap: (){
+                        cancelRideRequest();
+                        resetApp();
+                      },
+                      child: Container(
+                        height: 60.0,
+                        width: 60.0,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(26.0),
+                          border: Border.all(
+                            color: Colors.grey,
+                          ),
                         ),
+                        child: Icon(Icons.close, size: 26.0,),
                       ),
-                      child: Icon(Icons.close, size: 26.0,),
                     ),
                     SizedBox(
                       height: 10.0,
@@ -652,7 +717,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         builder: (BuildContext context) =>
             ProgressDialog(message: "Please wait..."));
 
-    var details = await GoogleMapsAPIMethods.obtainPlaceDirectionDetails(
+    var details = await MainAppAPI.obtainPlaceDirectionDetails(
         pickUpLatLng, dropOffLatLng);
     setState(() {
       tripDirectionDetail = details;

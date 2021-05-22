@@ -19,6 +19,8 @@ void main() async {
 
 DatabaseReference userRef =
     FirebaseDatabase.instance.reference().child("users");
+DatabaseReference rideRequestRef =
+    FirebaseDatabase.instance.reference().child("Ride Requests").push();
 final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
 class MyApp extends StatelessWidget {
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: LoginScreen.idScreen,
+        initialRoute: firebaseAuth.currentUser == null ? LoginScreen.idScreen: MainScreen.idScreen,
         routes: {
           RegistrationScreen.idScreen: (context) => RegistrationScreen(),
           LoginScreen.idScreen: (context) => LoginScreen(),

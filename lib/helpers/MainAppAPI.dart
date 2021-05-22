@@ -1,20 +1,25 @@
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:riderapp/configMaps.dart';
+import 'package:riderapp/appConfig.dart';
 import 'package:riderapp/dataHandler/appData.dart';
-import 'package:riderapp/helpers/GoogleMapsAPI.dart';
+import 'package:riderapp/helpers/GoogleMapsRepository.dart';
+import 'package:riderapp/main.dart';
 import 'package:riderapp/models/Address.dart';
 import 'package:riderapp/models/DirectionDetail.dart';
+import 'package:riderapp/models/User.dart';
 
-class GoogleMapsAPIMethods {
+class MainAppAPI {
   static Future<String> searchCoordinatesAddress(
       Position position, context) async {
     String placeAddress = "";
     String url =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}=$mapKey";
 
-    var response = await GoogleMapsAPI.getRequest(url);
+    var response = await GoogleMapsRepository.getRequest(url);
 
     if (response != "failed") {
       placeAddress = response["results"][0]["formatted_address"];
@@ -37,7 +42,7 @@ class GoogleMapsAPIMethods {
       LatLng initialPosition, LatLng destinationPosition) async {
     String directionUrl =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${initialPosition.latitude},${initialPosition.longitude}&destination=${destinationPosition.latitude},${destinationPosition.longitude}&key=$mapKey";
-    var resp = await GoogleMapsAPI.getRequest(directionUrl);
+    var resp = await GoogleMapsRepository.getRequest(directionUrl);
     if (resp == "failed") {
       return new DirectionDetail(distanceValue: 0, durationValue: 0, distanceText: "", durationText: "", encodedPoints: "");
     }
@@ -63,5 +68,16 @@ class GoogleMapsAPIMethods {
 
     return totalLocalAmount.truncate();
     
+  }
+
+  static void getCurrentOnlineUserInfo()async{
+    firebaseUser = FirebaseAuth.instance.currentUser!;
+    String userId = firebaseUser.uid;
+
+    userRef.child(userId).once().then((DataSnapshot snapshot){
+        if(snapshot.value != null){
+          currentUser = CurrentUser.fromSnapshot(snapshot);
+        }
+    });
   }
 }

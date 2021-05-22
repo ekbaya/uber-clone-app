@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:riderapp/configMaps.dart';
+import 'package:riderapp/appConfig.dart';
 import 'package:riderapp/dataHandler/appData.dart';
-import 'package:riderapp/helpers/GoogleMapsAPI.dart';
+import 'package:riderapp/helpers/GoogleMapsRepository.dart';
 import 'package:riderapp/models/Address.dart';
 import 'package:riderapp/models/PlacePrediction.dart';
 import 'package:riderapp/widgets/Divider.dart';
@@ -179,7 +179,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (placeName.length > 1) {
       String url =
           "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components=country:ke";
-      var res = await GoogleMapsAPI.getRequest(url);
+      var res = await GoogleMapsRepository.getRequest(url);
 
       if (res == "failed") {
         return;
@@ -261,7 +261,7 @@ class PredictionTile extends StatelessWidget {
 
     String placeDetailsUrl =
         "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
-    var resp = await GoogleMapsAPI.getRequest(placeDetailsUrl);
+    var resp = await GoogleMapsRepository.getRequest(placeDetailsUrl);
     Navigator.of(context).pop();
     if (resp == "failed") {
       return;
