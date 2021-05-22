@@ -6,4 +6,4 @@ String mapKey = "AIzaSyDuSoe0jf81d2kFUHBCED-wX0bR2QbHkQU";
 
 late User firebaseUser;
 
-late CurrentUser currentUser;
+CurrentUser currentUser = new CurrentUser(id: "", email: "", phone: "", name: "");

@@ -40,7 +40,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   bool drwawerOpen = true;
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     MainAppAPI.getCurrentOnlineUserInfo();
   }
@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       durationText: "",
       encodedPoints: "");
 
-  void saveRideRequest(){
+  void saveRideRequest() {
     var pickUp = Provider.of<AppData>(context).userPickUpLocation;
     var dropOff = Provider.of<AppData>(context).userDropOffLocation;
 
@@ -74,7 +74,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     Map rideInfoMap = {
       "driver_id": "waiting",
-      "payment_method":"cash",
+      "payment_method": "cash",
       "pickup": pickLocationMap,
       "dropoff": dropOffLocationMap,
       "craeted_at": DateTime.now().toString(),
@@ -87,7 +87,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     rideRequestRef.set(rideInfoMap);
   }
 
-  void cancelRideRequest(){
+  void cancelRideRequest() {
     rideRequestRef.remove();
     resetApp();
   }
@@ -138,7 +138,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     print("THIS IS YOUR ADDRESS:: " + address);
   }
 
-  void displayRequestRideContainer(){
+  void displayRequestRideContainer() {
     setState(() {
       requestRideContainerHeight = 250.0;
       rideDetailsContainerHeight = 0.0;
@@ -178,31 +178,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   decoration: BoxDecoration(
                     color: Colors.white,
                   ),
-                  child: Row(
-                    children: [
-                      Image.asset(
+                  child: Center(
+                    child: ListTile(
+                      leading: Image.asset(
                         "assets/images/user_icon.png",
                         height: 65.0,
                         width: 65.0,
                       ),
-                      SizedBox(
-                        width: 16.0,
+                      title: Text(
+                        currentUser.name,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            TextStyle(fontSize: 16.0, fontFamily: 'Brand-Bold'),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Profile Name",
-                            style: TextStyle(
-                                fontSize: 16.0, fontFamily: 'Brand-Bold'),
-                          ),
-                          SizedBox(
-                            height: 6.0,
-                          ),
-                          Text("Visit Profile")
-                        ],
-                      )
-                    ],
+                      subtitle: Text(currentUser.phone),
+                    ),
                   ),
                 ),
               ),
@@ -248,9 +238,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                onTap: (){
+                onTap: () {
                   firebaseAuth.signOut();
-                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.idScreen, (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, LoginScreen.idScreen, (route) => false);
                 },
               ),
             ],
@@ -646,7 +637,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                             'Request a Ride...',
                             textStyle: colorizeTextStyle,
                             colors: colorizeColors,
-                            
                           ),
                           ColorizeAnimatedText(
                             'Finding a driver...',
@@ -669,7 +659,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       height: 22.0,
                     ),
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         cancelRideRequest();
                         resetApp();
                       },
@@ -683,7 +673,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                             color: Colors.grey,
                           ),
                         ),
-                        child: Icon(Icons.close, size: 26.0,),
+                        child: Icon(
+                          Icons.close,
+                          size: 26.0,
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -691,7 +684,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     ),
                     Container(
                       width: double.infinity,
-                      child: Center(child: Text("Cancel Ride", style: TextStyle(fontSize: 15.0),)),
+                      child: Center(
+                          child: Text(
+                        "Cancel Ride",
+                        style: TextStyle(fontSize: 15.0),
+                      )),
                     ),
                   ],
                 ),
